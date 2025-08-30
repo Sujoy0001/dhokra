@@ -34,13 +34,13 @@ const FixImg = () => {
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       {/* Responsive container with 16:9 aspect ratio */}
-      <div className="w-auto h-[25vh] md:h-[45vh] lg:h-[60vh] xl:h-[66vh]">
+      <div className="w-auto h-auto">
         {currentImage ? (
           <motion.img
             key={currentImage.image} // Key helps React identify when image changes
             src={currentImage.image}
             alt="Current Display Image"
-            className="w-full h-full object-fill transition-all duration-500 ease-in-out group-hover:scale-105 cursor-pointer"
+            className="w-full h-full object-contain transition-all duration-500 ease-in-out group-hover:scale-105 cursor-pointer"
             loading="lazy"
             decoding="async"
             initial={{ opacity: 0 }}

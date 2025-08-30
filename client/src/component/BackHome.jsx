@@ -149,7 +149,7 @@ const CreativeBreadcrumbPage = () => {
 
   return (
     <div className="min-h-full bg-gradient-to-r from-emerald-500 to-teal-600 p-3 md:p-4 shadow-lg">
-      <div className="w-full md:max-w-6xl mx-auto flex flex-row sm:flex-row justify-between items-center gap-2 sm:gap-0">
+      <div className="w-full md:max-w-7xl mx-auto flex flex-row sm:flex-row justify-between items-center gap-2 sm:gap-0">
         <div className="w-auto overflow-hidden">
           <CreativeBreadcrumb items={currentBreadcrumbs} />
         </div>

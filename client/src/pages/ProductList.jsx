@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { FiHeart, FiEye } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { FiHeart, FiEye } from "react-icons/fi";
 import productStore from "../store/productStore.js";
 import trendingStore from "../store/trendingStore.js";
 import availableCollectionStore from "../store/availableCollectionStore.js";
@@ -10,48 +10,47 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
-  const [activeTab, setActiveTab] = useState(category || 'all');
+  const [activeTab, setActiveTab] = useState(category || "all");
+  const [priceFilter, setPriceFilter] = useState("all");
   const productsPerPage = 12;
 
   // Stores
   const { allTrending, setAllTrending, isLoading: isTrendingLoading } = trendingStore();
-  const { allAvailableCollection, setAllAvailableCollection, isLoading: isCollectionLoading } = availableCollectionStore();
+  const { allAvailableCollection, setAllAvailableCollection, isLoading: isCollectionLoading } =
+    availableCollectionStore();
   const {
     availableProductByCategory,
     setAvailableProductByCategory,
     message,
     error,
-    isLoading
+    isLoading,
   } = productStore();
 
-  const truncateTitle = (title, maxLength = 50) => {
-    return title.length > maxLength
-      ? `${title.substring(0, maxLength)}...`
-      : title;
-  };
+  const truncateTitle = (title, maxLength = 50) =>
+    title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
 
+  // Fetch products based on category
   useEffect(() => {
-    if (category === 'trending') {
+    if (category === "trending") {
       setAllTrending();
-      setActiveTab('trending');
-    } else if (category === 'available-collection') {
+      setActiveTab("trending");
+    } else if (category === "available-collection") {
       setAllAvailableCollection();
-      setActiveTab('available-collection');
+      setActiveTab("available-collection");
     } else if (category) {
       setAvailableProductByCategory(category);
       setActiveTab(category);
     } else {
-      setActiveTab('all');
+      setActiveTab("all");
     }
   }, [category, setAvailableProductByCategory, setAllTrending, setAllAvailableCollection]);
 
+  // Update displayed products
   useEffect(() => {
-    if (activeTab === 'trending') {
-      // For trending items, use the nested product object
-      setDisplayedProducts(allTrending.map(item => item.product || item));
-    } else if (activeTab === 'available-collection') {
-      // For available collection items, use the nested product object
-      setDisplayedProducts(allAvailableCollection.map(item => item.product || item));
+    if (activeTab === "trending") {
+      setDisplayedProducts(allTrending.map((item) => item.product || item));
+    } else if (activeTab === "available-collection") {
+      setDisplayedProducts(allAvailableCollection.map((item) => item.product || item));
     } else if (category) {
       setDisplayedProducts(availableProductByCategory);
     } else {
@@ -60,54 +59,77 @@ const ProductList = () => {
   }, [activeTab, allTrending, allAvailableCollection, availableProductByCategory, category]);
 
   // Calculate discount percentage
-  const calculateDiscount = (original, discounted) => {
-    return Math.round(((original - discounted) / original) * 100);
-  };
+  const calculateDiscount = (original, discounted) =>
+    Math.round(((original - discounted) / original) * 100);
 
-  // Toggle favorite status
+  // Toggle favorite
   const toggleFavorite = (productId) => {
-    if (favorites.includes(productId)) {
-      setFavorites(favorites.filter(id => id !== productId));
-    } else {
-      setFavorites([...favorites, productId]);
-    }
+    setFavorites((prev) =>
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+    );
   };
 
+  // Scroll to top on category change
   useEffect(() => {
     setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }, 100);
   }, [category]);
+
+  // 🔎 Apply price filter
+  const filterByPrice = (products) => {
+    switch (priceFilter) {
+      case "below-5000":
+        return products.filter((p) => (p.priceDiscount || p.priceFixed) < 5000);
+      case "5000-10000":
+        return products.filter((p) => {
+          const price = p.priceDiscount || p.priceFixed;
+          return price >= 5000 && price <= 10000;
+        });
+      case "10000-50000":
+        return products.filter((p) => {
+          const price = p.priceDiscount || p.priceFixed;
+          return price >= 10000 && price <= 50000;
+        });
+      case "50000+":
+        return products.filter((p) => (p.priceDiscount || p.priceFixed) > 50000);
+      default:
+        return products;
+    }
+  };
 
   const toTitleCase = (str) =>
     str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
 
-
-  // Pagination logic
+  // Pagination logic (✅ now paginates filtered products)
+  const filteredProducts = filterByPrice(displayedProducts);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = displayedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(displayedProducts.length / productsPerPage);
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   const isLoadingState = isLoading || isTrendingLoading || isCollectionLoading;
 
+  // Loading
   if (isLoadingState) {
-    return <div className="min-h-full py-2 px-2 lg:px-0">
-      <div className="max-w-7xl mx-auto text-center py-20">
-        <p>Loading products...</p>
+    return (
+      <div className="min-h-full py-2 px-2 lg:px-0">
+        <div className="max-w-7xl mx-auto text-center py-20">
+          <p>Loading products...</p>
+        </div>
       </div>
-    </div>;
+    );
   }
 
+  // Error
   if (error) {
-    return <div className="min-h-full py-2 px-2 lg:px-0">
-      <div className="max-w-7xl mx-auto text-center py-20 text-red-500">
-        <p>{error}</p>
+    return (
+      <div className="min-h-full py-2 px-2 lg:px-0">
+        <div className="max-w-7xl mx-auto text-center py-20 text-red-500">
+          <p>{error}</p>
+        </div>
       </div>
-    </div>;
+    );
   }
 
   return (
@@ -116,30 +138,56 @@ const ProductList = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-emerald-800 italic">
-            {activeTab === 'trending' ? 'Gift Items'
-              : activeTab === 'available-collection' ? 'Available Collection'
-                : category ? toTitleCase(category.replace(/-/g, ' ') + ' Products')
-                  : 'Our Products'}
+            {activeTab === "trending"
+              ? "Gift Items"
+              : activeTab === "available-collection"
+              ? "Available Collection"
+              : category
+              ? toTitleCase(category.replace(/-/g, " ") + " Products")
+              : "Our Products"}
           </h1>
-
           {message && <p className="text-green-500 mt-2">{message}</p>}
         </div>
 
+        {/* Price Filter UI */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10">
+          {[
+            { key: "all", label: "All" },
+            { key: "below-5000", label: "Below ₹5000" },
+            { key: "5000-10000", label: "₹5000 – ₹10000" },
+            { key: "10000-50000", label: "₹10000 – ₹50000" },
+            { key: "50000+", label: "Above ₹50000" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => {
+                setPriceFilter(key);
+                setCurrentPage(1);
+              }}
+              className={`px-4 py-2 rounded-md border ${
+                priceFilter === key ? "bg-emerald-900 text-white" : "hover:bg-gray-100"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* Product Grid */}
-        {displayedProducts.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {currentProducts.map((product) => (
                 <div
                   key={product._id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
+                  className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
                 >
-                  {/* Product Image Container */}
+                  {/* Product Image */}
                   <div className="relative aspect-square overflow-hidden">
                     <img
                       src={product.images?.[0]}
                       alt={product.name}
-                      className="w-full h-full object-contain justify-center transition-transform duration-500 hover:scale-105"
+                      className="w-full h-full object-contain justify-center transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {/* Discount Badge */}
@@ -150,13 +198,17 @@ const ProductList = () => {
                     )}
 
                     {/* Hover Actions */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300 flex items-center justify-center space-x-4 opacity-0 hover:opacity-100">
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300 flex items-center justify-center space-x-4 opacity-0 group-hover:opacity-100">
                       <button
                         onClick={(e) => {
                           e.preventDefault();
                           toggleFavorite(product._id);
                         }}
-                        className={`p-2 rounded-full shadow-md transition-colors duration-200 ${favorites.includes(product._id) ? 'bg-red-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                        className={`p-2 rounded-full shadow-md transition-colors duration-200 ${
+                          favorites.includes(product._id)
+                            ? "bg-red-500 text-white"
+                            : "bg-white text-gray-700 hover:bg-gray-100"
+                        }`}
                       >
                         <FiHeart />
                       </button>
@@ -210,7 +262,7 @@ const ProductList = () => {
               <div className="mt-12 flex justify-center">
                 <nav className="flex items-center space-x-2">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                     className="px-4 py-2 border rounded-md hover:bg-gray-100 disabled:opacity-50"
                   >
@@ -221,14 +273,18 @@ const ProductList = () => {
                     <button
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`px-4 py-2 border rounded-md ${currentPage === i + 1 ? 'bg-emerald-900 text-white' : 'hover:bg-gray-100'}`}
+                      className={`px-4 py-2 border rounded-md ${
+                        currentPage === i + 1
+                          ? "bg-emerald-900 text-white"
+                          : "hover:bg-gray-100"
+                      }`}
                     >
                       {i + 1}
                     </button>
                   ))}
 
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 border rounded-md hover:bg-gray-100 disabled:opacity-50"
                   >
@@ -240,7 +296,9 @@ const ProductList = () => {
           </>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500 font-semibold italic">No products available in this category</p>
+            <p className="text-gray-500 font-semibold italic">
+              No products available in this category
+            </p>
           </div>
         )}
       </div>
