@@ -6,6 +6,8 @@ import cat1 from "../assets/catagoryImage/cat01.png";
 import cat2 from "../assets/catagoryImage/cat02.png";
 import cat3 from "../assets/catagoryImage/cat03.png";
 import cat4 from "../assets/catagoryImage/cat04.png";
+import cat5 from "../assets/catagoryImage/cat05.png";
+import cat6 from "../assets/catagoryImage/cat06.png";
 
 const categories = [
   {
@@ -29,14 +31,14 @@ const categories = [
     link: "/product/pen-napkin-holder",
   },
   {
-    name: "Gift Collection",
-    image: cat4,
-    link: "/product/trending",
+    name: "Candle stand & Pooja Related",
+    image: cat5,
+    link: "/product/candle-stand-and-pooja-related",
   },
   {
-    name: "My Creativity",
-    image: cat3,
-    link: "/product/my-creativity",
+    name: "Gift Collection",
+    image: cat6,
+    link: "/product/trending",
   },
 ];
 
