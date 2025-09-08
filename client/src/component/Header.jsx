@@ -63,7 +63,7 @@ const Header = () => {
     </header>
 
     <div className="min-w-full lg:hidden container mx-auto h-14 px-4 bg-emerald-700 text-white flex justify-between items-center">
-      <div className="flex items-center space-x-6 overflow-y-scroll">
+      <div className="flex items-center space-x-6 overflow-x-scroll scrollbar-none">
         {/* Desktop Navigation (hidden on mobile) */}
         <nav className="flex items-center space-x-8 font-semibold italic">
           <Link to="/" className="hover:text-yellow-400 transition duration-300">
