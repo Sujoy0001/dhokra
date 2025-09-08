@@ -25,12 +25,12 @@ const categories = [
   {
     name: "Home Decor & Tabletop",
     image: cat3,
-    link: "/product/home-decor-tabletop",
+    link: "/product/home-decor-and-tabletop",
   },
   {
     name: "Pen & Napkin Holder",
     image: cat4,
-    link: "/product/pen-napkin-holder",
+    link: "/product/pen-and-napkin-holder",
   },
   {
     name: "Candle stand & Pooja Related",
