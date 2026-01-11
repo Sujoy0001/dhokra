@@ -111,9 +111,9 @@ const Home = () => {
                                                 }}
                                                 className="hidden md:block absolute bottom-0 left-0 right-0 p-5 pointer-events-none"
                                             >
-                                                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 transform transition-all duration-300 group-hover:bg-white group-hover:shadow-sm">
+                                                <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 transform transition-all duration-300 group-hover:bg-white group-hover:shadow-sm">
                                                     <div className="flex justify-between items-center">
-                                                        <h3 className="text-sm md:text-base font-bold text-emerald-800">
+                                                        <h3 className="text-sm md:text-base font-bold text-emerald-900 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">
                                                             {category.name}
                                                         </h3>
                                                         <Link
@@ -234,7 +234,7 @@ const Home = () => {
 
                 <section className="relative rounded-sm overflow-hidden shadow-xl">
                     {/* Slider Container */}
-                    <div className="relative max-w-full h-[25vh] md:h-[45vh] lg:h-[60vh] xl:h-[66vh] overflow-hidden">
+                    <div className="relative rounded-sm overflow-hidden shadow-xl aspect-[5/2]">
                         {slides.map((slide, index) => (
                         <div
                             key={slide.id}
